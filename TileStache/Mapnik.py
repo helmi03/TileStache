@@ -56,7 +56,7 @@ class ImageProvider:
             Local directory path to *.ttf font files.
 
         - "scale factor" (optional)
-            Scale multiplier used for Mapnik rendering pipeline. Used used for
+            Scale multiplier used for Mapnik rendering pipeline. Used for
             supporting retina resolution.
 
             For more information about the scale factor, see: 
