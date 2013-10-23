@@ -28,6 +28,7 @@ from time import time
 
 import httplib
 import logging
+import hashlib
 
 try:
     from json import load as json_load
@@ -259,9 +260,17 @@ def requestHandler2(config_hint, path_info, query_string=None, script_name=''):
             content = '%s(%s)' % (callback, content)
         
         if layer.max_cache_age is not None:
+            m = hashlib.sha1(content).hexdigest()
+            m_str = '"' + m + '"'
             expires = datetime.utcnow() + timedelta(seconds=layer.max_cache_age)
+            last_modified = datetime.utcnow() - timedelta(seconds=layer.max_cache_age)/2
+            last_modified_str = last_modified.strftime('%a %d %b %Y %H:%M:%S GMT')
+            last_modified_str = 'Thu, 19 Sep 2013 03:14:15 GMT'
             headers.setdefault('Expires', expires.strftime('%a %d %b %Y %H:%M:%S GMT'))
             headers.setdefault('Cache-Control', 'public, max-age=%d' % layer.max_cache_age)
+            headers.setdefault('ETag', m_str)
+            headers.setdefault('Vary Accept-Encoding', 'User-Agent')
+            headers.setdefault('Last-Modified', last_modified_str)
 
     except Core.KnownUnknown, e:
         out = StringIO()
