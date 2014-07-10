@@ -303,7 +303,7 @@ def _tile_perimeter_geom(coord, projection, padded):
         Uses _tile_perimeter().
     """
     perimeter = _tile_perimeter(coord, projection, padded)
-    wkt = 'POLYGON((%s))' % ', '.join(['%.3f %.3f' % xy for xy in perimeter])
+    wkt = 'POLYGON((%s))' % ', '.join(['%.7f %.7f' % xy for xy in perimeter])
     geom = ogr.CreateGeometryFromWkt(wkt)
     
     ref = osr.SpatialReference()
@@ -450,7 +450,7 @@ def _open_layer(driver_name, parameters, dirpath):
         layer = datasource.GetLayer(0)
 
     if layer.GetSpatialRef() is None and driver_name != 'SQLite': 
-        raise KnownUnknown('Couldn\'t get a layer from data source %s' % source_name)
+        raise KnownUnknown('The layer has no spatial reference: %s' % source_name)
 
     #
     # Return the layer and the datasource.

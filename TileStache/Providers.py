@@ -200,8 +200,12 @@ class Proxy:
             Provider name string from Modest Maps built-ins.
             See ModestMaps.builtinProviders.keys() for a list.
             Example: "OPENSTREETMAP".
+        - timeout (optional)
+            Defines a timeout in seconds for the request.
+            If not defined, the global default timeout setting will be used.
 
-        One of the above is required. When both are present, url wins.
+
+        Either url or provider is required. When both are present, url wins.
         
         Example configuration:
         
@@ -210,7 +214,7 @@ class Proxy:
             "url": "http://tile.openstreetmap.org/{Z}/{X}/{Y}.png"
         }
     """
-    def __init__(self, layer, url=None, provider_name=None):
+    def __init__(self, layer, url=None, provider_name=None, timeout=None):
         """ Initialize Proxy provider with layer and url.
         """
         if url:
@@ -225,6 +229,8 @@ class Proxy:
         else:
             raise Exception('Missing required url or provider parameter to Proxy provider')
 
+        self.timeout = timeout
+
     @staticmethod
     def prepareKeywordArgs(config_dict):
         """ Convert configured parameters to keyword args for __init__().
@@ -237,6 +243,9 @@ class Proxy:
         if 'provider' in config_dict:
             kwargs['provider_name'] = config_dict['provider']
 
+        if 'timeout' in config_dict:
+            kwargs['timeout'] = config_dict['timeout']
+
         return kwargs
 
     def renderTile(self, width, height, srs, coord):
@@ -245,8 +254,12 @@ class Proxy:
         img = None
         urls = self.provider.getTileUrls(coord)
 
+        # Explicitly tell urllib2 to get no proxies
+        proxy_support = urllib2.ProxyHandler({})
+        url_opener = urllib2.build_opener(proxy_support)
+
         for url in urls:
-            body = urllib.urlopen(url).read()
+            body = url_opener.open(url, timeout=self.timeout).read()
             tile = Verbatim(body)
 
             if len(urls) == 1:
@@ -278,11 +291,18 @@ class UrlTemplate:
         - referer (optional)
             String to use in the "Referer" header when making HTTP requests.
 
+        - source projection (optional)
+            Projection to transform coordinates into before making request
+        - timeout (optional)
+            Defines a timeout in seconds for the request.
+            If not defined, the global default timeout setting will be used.
+
         More on string substitutions:
         - http://docs.python.org/library/string.html#template-strings
     """
 
-    def __init__(self, layer, template, referer=None):
+    def __init__(self, layer, template, referer=None, source_projection=None,
+                 timeout=None):
         """ Initialize a UrlTemplate provider with layer and template string.
         
             http://docs.python.org/library/string.html#template-strings
@@ -290,6 +310,8 @@ class UrlTemplate:
         self.layer = layer
         self.template = Template(template)
         self.referer = referer
+        self.source_projection = source_projection
+        self.timeout = timeout
 
     @staticmethod
     def prepareKeywordArgs(config_dict):
@@ -300,6 +322,12 @@ class UrlTemplate:
         if 'referer' in config_dict:
             kwargs['referer'] = config_dict['referer']
 
+        if 'source projection' in config_dict:
+            kwargs['source_projection'] = Geography.getProjectionByName(config_dict['source projection'])
+
+        if 'timeout' in config_dict:
+            kwargs['timeout'] = config_dict['timeout']
+
         return kwargs
 
     def renderArea(self, width, height, srs, xmin, ymin, xmax, ymax, zoom):
@@ -307,6 +335,17 @@ class UrlTemplate:
         
             Each argument (width, height, etc.) is substituted into the template.
         """
+        if self.source_projection is not None:
+            ne_location = self.layer.projection.projLocation(Point(xmax, ymax))
+            ne_point = self.source_projection.locationProj(ne_location)
+            ymax = ne_point.y
+            xmax = ne_point.x
+            sw_location = self.layer.projection.projLocation(Point(xmin, ymin))
+            sw_point = self.source_projection.locationProj(sw_location)
+            ymin = sw_point.y
+            xmin = sw_point.x
+            srs = self.source_projection.srs
+
         mapping = {'width': width, 'height': height, 'srs': srs, 'zoom': zoom}
         mapping.update({'xmin': xmin, 'ymin': ymin, 'xmax': xmax, 'ymax': ymax})
 
@@ -316,7 +355,7 @@ class UrlTemplate:
         if self.referer:
             req.add_header('Referer', self.referer)
 
-        body = urllib2.urlopen(req).read()
+        body = urllib2.urlopen(req, timeout=self.timeout).read()
         tile = Verbatim(body)
 
         return tile

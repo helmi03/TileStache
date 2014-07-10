@@ -8,7 +8,9 @@ designers and cartographers.
 
 Documentation available at http://tilestache.org/doc/
 """
-__version__ = 'N.N.N'
+import os.path
+
+__version__ = open(os.path.join(os.path.dirname(__file__), 'VERSION')).read().strip()
 
 import re
 
@@ -223,9 +225,6 @@ def requestHandler2(config_hint, path_info, query_string=None, script_name=''):
         except KeyError:
             callback = None
         
-        if layer.allowed_origin:
-            headers.setdefault('Access-Control-Allow-Origin', layer.allowed_origin)
-        
         #
         # Special case for index page.
         #
@@ -254,7 +253,10 @@ def requestHandler2(config_hint, path_info, query_string=None, script_name=''):
         
         else:
             status_code, headers, content = layer.getTileResponse(coord, extension)
-    
+
+        if layer.allowed_origin:
+            headers.setdefault('Access-Control-Allow-Origin', layer.allowed_origin)
+
         if callback and 'json' in headers['Content-Type']:
             headers['Content-Type'] = 'application/javascript; charset=utf-8'
             content = '%s(%s)' % (callback, content)

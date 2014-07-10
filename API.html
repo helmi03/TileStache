@@ -961,7 +961,7 @@ Shared layer parameters:
     <dt>jpeg options</dt>
     <dd>
     An optional dictionary of JPEG creation options, passed through
-    <a href="http://www.pythonware.com/library/pil/handbook/format-jpeg.htm">to PIL</a>.
+    <a href="http://effbot.org/imagingbook/format-jpeg.htm">to PIL</a>.
     Valid options include <var>quality</var> (integer), <var>progressive</var>
     (boolean), and <var>optimize</var> (boolean).
     </dd>
@@ -969,7 +969,7 @@ Shared layer parameters:
     <dt>png options</dt>
     <dd>
     An optional dictionary of PNG creation options, passed through
-    <a href="http://www.pythonware.com/library/pil/handbook/format-png.htm">to PIL</a>.
+    <a href="http://effbot.org/imagingbook/format-png.htm">to PIL</a>.
     Valid options include <var>palette</var> (URL or filename), <var>palette256</var>
 	(boolean) and <var>optimize</var> (boolean).
     </dd>
@@ -1081,6 +1081,10 @@ Proxy provider parameters:
     Optional provider name string from Modest Maps built-ins. See
     <code>ModestMaps.builtinProviders.keys()</code> for a list. Example:
     <samp>"OPENSTREETMAP"</samp>.
+    </dd>
+    <dt>timeout</dt>
+    Defines a timeout in seconds for the request.
+    If not defined, the global default timeout setting will be used.
     </dd>
 </dl>
 
@@ -1311,6 +1315,14 @@ UrlTemplate provider parameters:
     Optional string with HTTP Referer URL to send to WMS server.
     Some WMS servers use the Referer request header to authenticate requests;
     this parameter provides one.
+    </dd>
+    <dt>source projection</dt>
+    Names a geographic projection, explained in <a href="#projections">Projections</a>, that
+    coordinates should be transformed to for requests.
+    </dd>
+    <dt>timeout</dt>
+    Defines a timeout in seconds for the request.
+    If not defined, the global default timeout setting will be used.
     </dd>
 </dl>
 
@@ -1958,7 +1970,7 @@ Arguments to <code>renderTile</code>:
 
 <p>
 Return value of <code>renderTile</code> is a
-<a href="http://www.pythonware.com/library/pil/handbook/image.htm#Image.save"><code>PIL.Image</code></a>
+<a href="http://effbot.org/imagingbook/image.htm#Image.save"><code>PIL.Image</code></a>
 or other saveable object, used like this:
 </p>
 
@@ -2030,7 +2042,7 @@ Arguments to <code>renderArea</code>:
 
 <p>
 Return value of <code>renderArea</code> is a
-<a href="http://www.pythonware.com/library/pil/handbook/image.htm#Image.save"><code>PIL.Image</code></a>
+<a href="http://effbot.org/imagingbook/image.htm#Image.save"><code>PIL.Image</code></a>
 or other saveable object, used like this:
 </p>
 

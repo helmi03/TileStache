@@ -1,111 +1,59 @@
-VERSION:=$(shell cat VERSION)
-PACKAGE=TileStache-$(VERSION)
-TARBALL=$(PACKAGE).tar.gz
+VERSION:=$(shell cat TileStache/VERSION)
 DOCROOT=tilestache.org:public_html/tilestache/www
 
-all: $(TARBALL)
-	#
-
-live: $(TARBALL) doc
-	scp $(TARBALL) $(DOCROOT)/download/
+live: doc
 	rsync -Cr doc/ $(DOCROOT)/doc/
-	python setup.py register
-
-$(TARBALL): doc
-	mkdir $(PACKAGE)
-	ln setup.py $(PACKAGE)/
-	ln README.md $(PACKAGE)/
-	ln VERSION $(PACKAGE)/
-	ln tilestache.cfg $(PACKAGE)/
-	ln tilestache.cgi $(PACKAGE)/
-
-	mkdir $(PACKAGE)/TileStache
-	ln TileStache/*.py $(PACKAGE)/TileStache/
-
-	rm $(PACKAGE)/TileStache/__init__.py
-	cp TileStache/__init__.py $(PACKAGE)/TileStache/__init__.py
-	perl -pi -e 's#\bN\.N\.N\b#$(VERSION)#' $(PACKAGE)/TileStache/__init__.py
-
-	mkdir $(PACKAGE)/TileStache/Vector
-	ln TileStache/Vector/*.py $(PACKAGE)/TileStache/Vector/
-
-	mkdir $(PACKAGE)/TileStache/Goodies
-	ln TileStache/Goodies/*.py $(PACKAGE)/TileStache/Goodies/
-
-	mkdir $(PACKAGE)/TileStache/Goodies/Caches
-	ln TileStache/Goodies/Caches/*.py $(PACKAGE)/TileStache/Goodies/Caches/
-
-	mkdir $(PACKAGE)/TileStache/Goodies/Providers
-	ln TileStache/Goodies/Providers/*.py $(PACKAGE)/TileStache/Goodies/Providers/
-	ln TileStache/Goodies/Providers/*.ttf $(PACKAGE)/TileStache/Goodies/Providers/
-
-	mkdir $(PACKAGE)/TileStache/Goodies/VecTiles
-	ln TileStache/Goodies/VecTiles/*.py $(PACKAGE)/TileStache/Goodies/VecTiles/
-
-	mkdir $(PACKAGE)/scripts
-	ln scripts/*.py $(PACKAGE)/scripts/
-
-	mkdir $(PACKAGE)/examples
-	#ln examples/*.py $(PACKAGE)/examples/
-
-	mkdir $(PACKAGE)/doc
-	ln doc/*.html $(PACKAGE)/doc/
-
-	mkdir $(PACKAGE)/man
-	ln man/*.1 $(PACKAGE)/man/
-
-	tar -czf $(TARBALL) $(PACKAGE)
-	rm -rf $(PACKAGE)
+	python setup.py sdist upload
 
 doc:
 	mkdir doc
 
-	pydoc -w TileStache
-	pydoc -w TileStache.Core
-	pydoc -w TileStache.Caches
-	pydoc -w TileStache.Memcache
-	pydoc -w TileStache.Redis
-	pydoc -w TileStache.S3
-	pydoc -w TileStache.Config
-	pydoc -w TileStache.Vector
-	pydoc -w TileStache.Vector.Arc
-	pydoc -w TileStache.Geography
-	pydoc -w TileStache.Providers
-	pydoc -w TileStache.Mapnik
-	pydoc -w TileStache.MBTiles
-	pydoc -w TileStache.Sandwich
-	pydoc -w TileStache.Pixels
-	pydoc -w TileStache.Goodies
-	pydoc -w TileStache.Goodies.Caches
-	pydoc -w TileStache.Goodies.Caches.LimitedDisk
-	pydoc -w TileStache.Goodies.Caches.GoogleCloud
-	pydoc -w TileStache.Goodies.Providers
-	pydoc -w TileStache.Goodies.Providers.Composite
-	pydoc -w TileStache.Goodies.Providers.Cascadenik
-	pydoc -w TileStache.Goodies.Providers.PostGeoJSON
-	pydoc -w TileStache.Goodies.Providers.SolrGeoJSON
-	pydoc -w TileStache.Goodies.Providers.MapnikGrid
-	pydoc -w TileStache.Goodies.Providers.MirrorOSM
-	pydoc -w TileStache.Goodies.Providers.Monkeycache
-	pydoc -w TileStache.Goodies.Providers.UtfGridComposite
-	pydoc -w TileStache.Goodies.Providers.UtfGridCompositeOverlap
-	pydoc -w TileStache.Goodies.Providers.TileDataOSM
-	pydoc -w TileStache.Goodies.Providers.Grid
-	pydoc -w TileStache.Goodies.Providers.GDAL
-	pydoc -w TileStache.Goodies.AreaServer
-	pydoc -w TileStache.Goodies.StatusServer
-	pydoc -w TileStache.Goodies.Proj4Projection
-	pydoc -w TileStache.Goodies.ExternalConfigServer
-	pydoc -w TileStache.Goodies.VecTiles
-	pydoc -w TileStache.Goodies.VecTiles.server
-	pydoc -w TileStache.Goodies.VecTiles.client
-	pydoc -w TileStache.Goodies.VecTiles.geojson
-	pydoc -w TileStache.Goodies.VecTiles.topojson
-	pydoc -w TileStache.Goodies.VecTiles.mvt
-	pydoc -w TileStache.Goodies.VecTiles.wkb
-	pydoc -w TileStache.Goodies.VecTiles.ops
+	python -m pydoc -w TileStache
+	python -m pydoc -w TileStache.Core
+	python -m pydoc -w TileStache.Caches
+	python -m pydoc -w TileStache.Memcache
+	python -m pydoc -w TileStache.Redis
+	python -m pydoc -w TileStache.S3
+	python -m pydoc -w TileStache.Config
+	python -m pydoc -w TileStache.Vector
+	python -m pydoc -w TileStache.Vector.Arc
+	python -m pydoc -w TileStache.Geography
+	python -m pydoc -w TileStache.Providers
+	python -m pydoc -w TileStache.Mapnik
+	python -m pydoc -w TileStache.MBTiles
+	python -m pydoc -w TileStache.Sandwich
+	python -m pydoc -w TileStache.Pixels
+	python -m pydoc -w TileStache.Goodies
+	python -m pydoc -w TileStache.Goodies.Caches
+	python -m pydoc -w TileStache.Goodies.Caches.LimitedDisk
+	python -m pydoc -w TileStache.Goodies.Caches.GoogleCloud
+	python -m pydoc -w TileStache.Goodies.Providers
+	python -m pydoc -w TileStache.Goodies.Providers.Composite
+	python -m pydoc -w TileStache.Goodies.Providers.Cascadenik
+	python -m pydoc -w TileStache.Goodies.Providers.PostGeoJSON
+	python -m pydoc -w TileStache.Goodies.Providers.SolrGeoJSON
+	python -m pydoc -w TileStache.Goodies.Providers.MapnikGrid
+	python -m pydoc -w TileStache.Goodies.Providers.MirrorOSM
+	python -m pydoc -w TileStache.Goodies.Providers.Monkeycache
+	python -m pydoc -w TileStache.Goodies.Providers.UtfGridComposite
+	python -m pydoc -w TileStache.Goodies.Providers.UtfGridCompositeOverlap
+	python -m pydoc -w TileStache.Goodies.Providers.TileDataOSM
+	python -m pydoc -w TileStache.Goodies.Providers.Grid
+	python -m pydoc -w TileStache.Goodies.Providers.GDAL
+	python -m pydoc -w TileStache.Goodies.AreaServer
+	python -m pydoc -w TileStache.Goodies.StatusServer
+	python -m pydoc -w TileStache.Goodies.Proj4Projection
+	python -m pydoc -w TileStache.Goodies.ExternalConfigServer
+	python -m pydoc -w TileStache.Goodies.VecTiles
+	python -m pydoc -w TileStache.Goodies.VecTiles.server
+	python -m pydoc -w TileStache.Goodies.VecTiles.client
+	python -m pydoc -w TileStache.Goodies.VecTiles.geojson
+	python -m pydoc -w TileStache.Goodies.VecTiles.topojson
+	python -m pydoc -w TileStache.Goodies.VecTiles.mvt
+	python -m pydoc -w TileStache.Goodies.VecTiles.wkb
+	python -m pydoc -w TileStache.Goodies.VecTiles.ops
 
-	pydoc -w scripts/tilestache-*.py
+	python -m pydoc -w scripts/tilestache-*.py
 
 	mv TileStache.html doc/
 	mv TileStache.*.html doc/
@@ -119,4 +67,4 @@ doc:
 
 clean:
 	find TileStache -name '*.pyc' -delete
-	rm -rf $(TARBALL) doc
+	rm -rf doc
